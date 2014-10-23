@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Cocoa
 
 private let _sharedInstance = IDENotificationHandler()
 
@@ -19,5 +20,9 @@ private let _sharedInstance = IDENotificationHandler()
         println("IDENotificationHandler from Swift")
         
         var handler = LAFIDENotificationHandler.sharedHandler()
+        
+        var alert = NSAlert();
+        alert.addButtonWithTitle("hey");
+        alert.runModal()
     }
 }
