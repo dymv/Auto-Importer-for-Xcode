@@ -20,9 +20,5 @@ private let _sharedInstance = IDENotificationHandler()
         println("IDENotificationHandler from Swift")
         
         var handler = LAFIDENotificationHandler.sharedHandler()
-        
-        var alert = NSAlert();
-        alert.addButtonWithTitle("hey");
-        alert.runModal()
     }
 }
