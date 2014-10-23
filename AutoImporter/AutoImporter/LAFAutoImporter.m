@@ -10,6 +10,7 @@
 #import "LAFAutoImporter.h"
 #import "LAFProjectsInspector.h"
 #import "LAFIDENotificationHandler.h"
+#import "Auto_Importer-Swift.h"
 
 static LAFAutoImporter *sharedPlugin;
 
@@ -49,7 +50,7 @@ static OSStatus lafHotKeyHandler(EventHandlerCallRef nextHandler, EventRef anEve
 {
     if (self = [super init]) {
         // init inspector
-        [LAFIDENotificationHandler sharedHandler];
+        [IDENotificationHandler sharedInstance];
         
         // reference to plugin's bundle, for resource acccess
         self.bundle = plugin;
