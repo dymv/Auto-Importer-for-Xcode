@@ -28,17 +28,19 @@
 - (NSArray *)createCategoryElements:(NSTextCheckingResult *)match from:(NSString *)content {
     NSRange matchRange = [match rangeAtIndex:1];
     NSString *matchString = [content substringWithRange:matchRange];
-    NSString *matchClass = [matchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    NSString *matchClass =
+        [matchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     
     matchRange = [match rangeAtIndex:2];
     matchString = [content substringWithRange:matchRange];
-    NSString *matchMethods = [matchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    NSString *matchMethods =
+            [matchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     NSArray *methods = [matchMethods componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-    NSMutableArray *elements = [NSMutableArray array];
+    NSMutableArray *elements = [[NSMutableArray alloc] init];
     for (NSString *method in methods) {
         NSString *signature = [self extractSignature:method];
         if (signature) {
-            LAFIdentifier *element = [LAFIdentifier new];
+            LAFIdentifier *element = [[LAFIdentifier alloc] init];
             element.name = [self extractSignature:method];
             element.customTypeString = matchClass;
             element.type = LAFIdentifierTypeCategory;
@@ -46,33 +48,42 @@
         }
     }
     
-    return elements;
+    return [elements copy];
 }
 
 - (NSString *)extractSignature:(NSString *)method {
+    if ([method length] == 0) {
+        return nil;
+    }
+
     NSError *error = nil;
-    NSRegularExpression *regex = [NSRegularExpression
-                                  regularExpressionWithPattern:@"([a-z][a-z0-9_]+\\s*[:;])"
-                                  options:NSRegularExpressionCaseInsensitive|NSRegularExpressionAllowCommentsAndWhitespace
-                                  error:&error];
+    NSRegularExpression *regex =
+        [NSRegularExpression regularExpressionWithPattern:@"([a-z][a-z0-9_]+\\s*[:;])"
+                                                  options:NSRegularExpressionCaseInsensitive |
+                                                          NSRegularExpressionAllowCommentsAndWhitespace
+                                                    error:&error];
     
     if (error) {
         LAFLog(@"processing header path error: %@", error);
         return nil;
     }
     
-    NSMutableString *signature = [NSMutableString string];
-    [regex enumerateMatchesInString:method options:0 range:NSMakeRange(0, [method length]) usingBlock:^(NSTextCheckingResult *match, NSMatchingFlags flags, BOOL *stop){
+    NSMutableString *signature = [[NSMutableString alloc] init];
+    [regex enumerateMatchesInString:method
+                            options:0
+                              range:NSMakeRange(0, [method length])
+                         usingBlock:^(NSTextCheckingResult *match, NSMatchingFlags flags, BOOL *stop){
         NSRange matchRange = [match rangeAtIndex:1];
         NSString *matchString = [method substringWithRange:matchRange];
-        NSString *matchPart = [matchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        NSString *matchPart =
+            [matchString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         NSString *partWithoutSpaces = [matchPart stringByReplacingOccurrencesOfString:@" " withString:@""];
         if ([partWithoutSpaces hasSuffix:@";"]) {
             if ([signature length] > 0) {
                 return; // it's not the first part so it already has a name
             } else {
                 // remove ';' since we're not interested in it
-                partWithoutSpaces = [partWithoutSpaces substringToIndex:partWithoutSpaces.length - 1];
+                partWithoutSpaces = [partWithoutSpaces substringToIndex:([partWithoutSpaces length] - 1)];
             }
         }
         
@@ -80,7 +91,7 @@
     }];
     
     if ([signature length] > 0)
-        return signature;
+        return [signature copy];
     else
         return nil;
 }
